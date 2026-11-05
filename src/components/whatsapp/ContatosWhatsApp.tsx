@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import ConfiguracaoAgente from './ConfiguracaoAgente';
 
 type Cliente = { id: string; usuario_id: string; nome: string; telefone_whatsapp: string; autoriza_mensagens: boolean };
 type Pedido = { id: string; cliente_id: string; data_compra: string; status: string };
 type Contato = { id: string; cliente_id: string; data_contato: string; status_envio: string; compra_referencia_id: string };
-type Aba = 'oportunidades' | 'clientes' | 'pedidos' | 'historico';
+type Aba = 'oportunidades' | 'clientes' | 'pedidos' | 'historico' | 'configuracao';
 type Props = { supabase: SupabaseClient };
 
 const inputClass = 'mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring';
@@ -212,8 +213,9 @@ export default function ContatosWhatsApp({ supabase }: Props) {
         {notice && <div role="status" className="rounded-lg border bg-muted p-4 text-sm">{notice}</div>}
         {!authReady ? <p className="rounded-lg border p-6 text-center text-muted-foreground">Verificando sessão…</p> : !userId ? <section className="flex min-h-64 flex-col items-center justify-center rounded-xl border bg-card p-8 text-center"><h2 className="text-xl font-semibold">Entre na sua conta</h2><p className="mt-2 text-muted-foreground">Use o acesso existente do aplicativo para consultar seus clientes e pedidos.</p></section> : <>
           <nav aria-label="Seções do agente de contatos" className="flex flex-wrap gap-2 rounded-lg border bg-card p-2">
-            {([['oportunidades', 'Oportunidades'], ['clientes', 'Clientes'], ['pedidos', 'Pedidos'], ['historico', 'Histórico']] as const).map(([key, label]) => <button key={key} type="button" aria-current={aba === key ? 'page' : undefined} className={aba === key ? buttonClass : secondaryClass} onClick={() => setAba(key)}>{label}</button>)}
+            {([['oportunidades', 'Oportunidades'], ['clientes', 'Clientes'], ['pedidos', 'Pedidos'], ['historico', 'Histórico'], ['configuracao', 'Configuração do agente']] as const).map(([key, label]) => <button key={key} type="button" aria-current={aba === key ? 'page' : undefined} className={aba === key ? buttonClass : secondaryClass} onClick={() => setAba(key)}>{label}</button>)}
           </nav>
+          <div hidden={aba !== 'configuracao'}><ConfiguracaoAgente key={userId} /></div>
           {loading && <p role="status" className="text-sm text-muted-foreground">Carregando registros…</p>}
           {!loading && !loaded && <p className="rounded-lg border p-6 text-center text-muted-foreground">Os dados não estão disponíveis. Use Atualizar dados para tentar novamente.</p>}
           {loaded && <>
